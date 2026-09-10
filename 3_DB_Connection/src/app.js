@@ -3,6 +3,7 @@ const connectDB = require("./config/db");
 const NotesModel = require("./models/notes.model");
 const app = express();
 app.use(express.json());
+require('dotenv').config();
 
 connectDB();
 
