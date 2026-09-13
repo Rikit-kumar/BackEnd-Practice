@@ -1,8 +1,8 @@
-import app from "./app/app.js";
-import connectDataBase from "./config/db.js";
+  import app from "./app/app.js";
+  import connectDataBase from "./config/db.js";
 
-await connectDataBase();
+  await connectDataBase();
 
-app.listen(3000, () => {
-  console.log("Server is runing on port 3000");
-});
+  app.listen(3000, () => {
+    console.log("Server is runing on port 3000");
+  });

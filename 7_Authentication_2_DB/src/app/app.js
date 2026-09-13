@@ -2,6 +2,8 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import authUserModel from "../models/authUser.model.js";
+import { authentication } from "../middleware/auth.middleware.js";
+import bcrypt from "bcryptjs";
 dotenv.config();
 
 const app = express();
@@ -19,14 +21,14 @@ app.post("/api/auth/register", async (req, res) => {
   const user = await authUserModel.create({
     name,
     email,
-    password,
+    password: await bcrypt.hash(password, 10),
   });
 
   const token = jwt.sign(
     {
       id: user._id,
     },
-    "fd4097401a7a7fd449d24f4229f76b1551db98c8b44aa8049fc3e966f219e4c1dcdb7de8b716ed1b8c050436b8c575779f0eb439",
+    process.env.JWT_SECRET,
   );
 
   res.status(201).json({
@@ -42,18 +44,50 @@ app.post("/api/auth/register", async (req, res) => {
   });
 });
 
-app.get("/api/auth/me", async (req, res) => {
-  const authHeader = req.headers.authorization;
-  const data = jwt.decode(authHeader);
-  const user = await authUserModel.findById(data.id);
+app.get("/api/auth/me", authentication, async (req, res) => {
+  console.log(req.user);
 
   res.status(200).json({
-    message: "User Fetch Successfully",
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
+    message: "User fetch successfully",
+    data: {
+      user: {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+      },
     },
+  });
+});
+
+app.post("/api/auth/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  const loginUser = await authUserModel.findOne({email});
+
+  const isValidPassword = bcrypt.compare(password, loginUser.password);
+
+  if (!isValidPassword) {
+    res.status(400).json({
+      message: "invalid Email or Password",
+    });
+  }
+
+  const token = jwt.sign(
+    {
+      id: loginUser._id,
+    },
+    process.env.JWT_SECRET,
+  );
+
+  res.status(200).json({
+    message: "User LoggedIn Successfully",
+    data: {
+      user: {
+        name: loginUser.name,
+        email: loginUser.email,
+      },
+    },
+    token,
   });
 });
 
