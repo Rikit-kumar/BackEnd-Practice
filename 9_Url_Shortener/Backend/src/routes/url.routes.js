@@ -6,6 +6,6 @@ const router = Router();
 router.post("/api/url", generateLongToShortUrlController);
 router.get("/api/url/all", getAllUrlsController)
 router.get("/:code", redirectOriginalUrlController)
-router.delete("/:id", deleteUrlController)
+router.delete("/api/:id", deleteUrlController)
 
 export default router;

@@ -42,7 +42,7 @@ export const generateLongToShortUrlController = async (req, res) => {
 };
 
 export const getAllUrlsController = async (req, res) => {
-  const urls = await urlModel.find();
+  const urls = await urlModel.find().sort({_id: -1});
 
   return res.status(200).json({
     message: "URLs Fetched Successfully",
