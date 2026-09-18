@@ -2,23 +2,25 @@ import { body, validationResult } from "express-validator";
 
 export const registerValidator = [
   body("email")
-    .exists()
-    .withMessage("Email is Required")
+    .trim()
+    .notEmpty()
+    .withMessage("Email is required")
     .isEmail()
-    .withMessage("Invalid Email Address"),
+    .withMessage("Invalid email address")
+    .normalizeEmail(),
 
   body("phone")
-    .exists()
-    .withMessage("Phone number is Required")
+    .trim()
+    .notEmpty()
+    .withMessage("Phone number is required")
     .isMobilePhone("en-IN")
-    .withMessage("Invalid Phone Number"),
+    .withMessage("Invalid phone number"),
 
   body("password")
-    .exists()
-    .withMessage("Password is Required")
-    .trim()
+    .notEmpty()
+    .withMessage("Password is required")
     .isLength({ min: 6 })
-    .withMessage("Password contain atleast 6 character"),
+    .withMessage("Password must contain at least 6 characters"),
 
   (req, res, next) => {
     const errors = validationResult(req);
@@ -28,7 +30,6 @@ export const registerValidator = [
         errors: errors.array(),
       });
     }
-
     next();
   },
 ];
