@@ -131,7 +131,13 @@ export const refreshTokenController = async (req, res) => {
     try {
       const decoded = verifyRefreshToken(refreshToken);
 
-      const user = await UserModel.findById(decodec.id);
+      const user = await UserModel.findById(decoded.id);
+
+      if (!user) {
+        return res.status(401).json({
+          message: "Unauthorized, User not found",
+        });
+      }
 
       if (refreshToken !== user.refreshToken) {
         return res.status(401).json({
@@ -144,12 +150,12 @@ export const refreshTokenController = async (req, res) => {
         role: user.role,
       });
 
-      res.cookie("refreshToken", newRefreshToken, {
-        httpOnly: true,
-      });
-
       await UserModel.findByIdAndUpdate(user._id, {
         refreshToken: newRefreshToken,
+      });
+
+      res.cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
       });
 
       res.status(200).json({
@@ -178,6 +184,12 @@ export const userDetailController = async (req, res) => {
     try {
       const decoded = verifyAccessToken(accessToken);
       const user = await UserModel.findById(decoded.id);
+
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found",
+        });
+      }
 
       res.status(200).json({
         message: "User detail Fetched successfully",
