@@ -1,4 +1,4 @@
-import { verifyAccessToken } from "../src/util/authentication.js";
+import { verifyAccessToken } from "../util/authentication.js";
 
 export const authentication = (req, res, next) => {
   const accessToken = req.headers.authorization.split(" ")[1];
