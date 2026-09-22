@@ -179,33 +179,25 @@ export const refreshTokenController = async (req, res) => {
 
 export const userDetailController = async (req, res) => {
   try {
-    const accessToken = req.headers.authorization?.split(" ")[1];
+    const { id } = req.user;
+    const user = await UserModel.findById(id);
 
-    try {
-      const decoded = verifyAccessToken(accessToken);
-      const user = await UserModel.findById(decoded.id);
-
-      if (!user) {
-        return res.status(404).json({
-          message: "User not found",
-        });
-      }
-
-      res.status(200).json({
-        message: "User detail Fetched successfully",
-        data: {
-          user: {
-            name: user.name,
-            email: user.email,
-            role: user.role,
-          },
-        },
-      });
-    } catch (error) {
-      return res.status(401).json({
-        message: "Unauthorized, Invalid or expire access token",
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
       });
     }
+
+    res.status(200).json({
+      message: "User detail Fetched successfully",
+      data: {
+        user: {
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      },
+    });
   } catch (error) {
     console.log("user Detail controller error", error);
     return res.status(500).json({
