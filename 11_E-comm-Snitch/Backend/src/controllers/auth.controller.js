@@ -140,6 +140,11 @@ export const refreshTokenController = async (req, res) => {
       }
 
       if (refreshToken !== user.refreshToken) {
+
+        await UserModel.findByIdAndUpdate(decoded.id, {
+          refreshToken: null
+        })
+
         return res.status(401).json({
           message: "Unauthorized, Refresh token mismatch",
         });
