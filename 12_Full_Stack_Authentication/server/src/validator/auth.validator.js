@@ -82,3 +82,33 @@ export const registerValidator = [
 
   handleValidationResult,
 ];
+
+export const loginValidator = [
+  body("email")
+    .exists()
+    .withMessage("Email is required")
+    .bail()
+    .isString()
+    .withMessage("Email must be String value")
+    .bail()
+    .trim()
+    .notEmpty()
+    .withMessage("Email cannot be empty")
+    .bail()
+    .isEmail()
+    .withMessage("Please enter a valid email address"),
+  body("password")
+    .exists()
+    .withMessage("Password is required")
+    .bail()
+    .isString()
+    .withMessage("Password must be String value")
+    .bail()
+    .notEmpty()
+    .withMessage("Password cannot be empty")
+    .bail()
+    .isLength({ min: 6, max:128 })
+    .withMessage("Password must contain 8 to 128 characters"),
+
+    handleValidationResult
+]
