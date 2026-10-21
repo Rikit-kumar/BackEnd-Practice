@@ -9,7 +9,7 @@ router.post('/register', registerValidator, registerUserController)
 router.post('/login', loginValidator, loginUserController)
 router.post('/refresh', tokenRefreshController)
 
+router.post('/logout', authenticate, )
 router.get('/me', authenticate, meApiController)
-router.get('/logout', authenticate, )
 
 export default router
