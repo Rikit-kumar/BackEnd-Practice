@@ -92,7 +92,7 @@ export const loginUserController = async (req, res) => {
 
 export const tokenRefreshController = async (req, res) => {
   try {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) {
       return res.status(401).json({
         message: "Unauthorized, Refresh token not found",
@@ -147,6 +147,34 @@ export const tokenRefreshController = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const meApiController = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const user = await userModel.findById(id);
+
+    if (!user) {
+      return res.status(401).json({
+        message: "Unauthorized, user not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "User detail fetched successfully",
+      data: {
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+        },
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
       message: "Internal server error",
     });
   }
