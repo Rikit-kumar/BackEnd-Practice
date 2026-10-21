@@ -179,3 +179,32 @@ export const meApiController = async (req, res) => {
     });
   }
 };
+
+export const logoutUserController = async(req, res)=>{
+  try {
+
+    const {id} = req.user;
+    const user = await userModel.findById(id);
+
+    if(!user){
+      return res.status(401).json({
+        message: "Unauthorized, user not found",
+      });
+    }
+
+    await userModel.findByIdAndUpdate(user._id, {
+      refreshToken: null
+    })
+
+    res.clearCookie("refreshToken");
+
+    return res.staus(200).json({
+      message: "User logged Out successfully"
+    })
+    
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error"
+    })
+  }
+}
