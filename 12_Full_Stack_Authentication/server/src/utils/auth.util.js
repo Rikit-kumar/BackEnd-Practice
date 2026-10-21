@@ -11,3 +11,7 @@ export const generateToken = ({ id }) => {
 
   return { accessToken, refreshToken };
 };
+
+export const verifyRefreshToken = (token)=>{
+  return jwt.verify(token, config.REFRESH_SECRET_TOKEN)
+}
