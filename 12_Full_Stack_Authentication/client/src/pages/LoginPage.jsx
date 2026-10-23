@@ -1,5 +1,8 @@
-import React from "react";
-import { Link } from "react-router";
+import React, { useContext } from "react";
+import { NavLink } from "react-router";
+import AuthHook from "../hooks/AuthHook";
+import { AuthContextStore } from "../context/AuthContext";
+
 import {
   Mail,
   LockKeyhole,
@@ -11,6 +14,11 @@ import {
 } from "lucide-react";
 
 const LoginPage = () => {
+  const { register, handleSubmit, getValues, loginHandleSubmit, errors } =
+    AuthHook();
+
+  const { showPassword, setShowPassword } = useContext(AuthContextStore);
+
   const inputClass =
     "w-full rounded-xl border border-[#3A4B63] bg-[#1B2A3D] py-3.5 pl-12 pr-12 text-sm text-[#F1F5F9] placeholder:text-[#8190A5] outline-none transition duration-200 focus:border-[#4F8CFF] focus:ring-2 focus:ring-[#4F8CFF]/20";
 
@@ -119,7 +127,10 @@ const LoginPage = () => {
             </div>
 
             {/* Login Form - UI Only */}
-            <form className="space-y-6">
+            <form
+              onSubmit={handleSubmit(loginHandleSubmit)}
+              className="space-y-6"
+            >
               {/* Email */}
               <div>
                 <label htmlFor="email" className={labelClass}>
@@ -135,8 +146,22 @@ const LoginPage = () => {
                     type="email"
                     placeholder="you@example.com"
                     className={inputClass}
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value:
+                          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                        message: "Please enter a valid email address",
+                      },
+                    })}
                   />
                 </div>
+                {errors.email && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {" "}
+                    {errors.email.message}{" "}
+                  </p>
+                )}
               </div>
 
               {/* Password */}
@@ -145,7 +170,6 @@ const LoginPage = () => {
                   <label htmlFor="password" className={labelClass + " mb-0"}>
                     Password
                   </label>
-
                 </div>
 
                 <div className="relative">
@@ -154,25 +178,37 @@ const LoginPage = () => {
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     className={inputClass}
+                    {...register("password", {
+                      required: "Password is required",
+                    })}
                   />
 
                   <button
                     type="button"
-                    aria-label="Password visibility icon"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={
+                      showPassword ? "Hide Password" : "Show password"
+                    }
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8190A5]"
                   >
                     <Eye className="h-5 w-5" />
                   </button>
                 </div>
-              </div>
 
+                {errors.password && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {" "}
+                    {errors.password.message}{" "}
+                  </p>
+                )}
+              </div>
 
               {/* Login Button */}
               <button
-                type="button"
+                type="submit"
                 className="group flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4F8CFF] to-[#6B7CFF] px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-500/25"
               >
                 Sign in to your account
@@ -183,12 +219,12 @@ const LoginPage = () => {
             {/* Register Link */}
             <p className="mt-8 text-center text-sm text-[#A8B5C8]">
               Don't have an account?{" "}
-              <Link
+              <NavLink
                 to="/register"
                 className="font-semibold text-[#6DA8FF] transition hover:text-[#A5A0FF]"
               >
                 Create account
-              </Link>
+              </NavLink>
             </p>
 
             {/* Bottom Footer */}

@@ -1,6 +1,8 @@
-import React, { useState } from "react";
-import { NavLink, useNavigate } from "react-router";
-import { useForm } from "react-hook-form";
+import React, { useContext, useState } from "react";
+import { NavLink } from "react-router";
+import AuthHook from "../hooks/AuthHook";
+import { AuthContextStore } from "../context/AuthContext";
+
 import {
   UserRound,
   Mail,
@@ -10,31 +12,14 @@ import {
   ArrowRight,
   CheckCircle2,
 } from "lucide-react";
-import { toast } from "react-toastify";
+
 
 const RegisterPage = () => {
+  const { register, handleSubmit, getValues, registerHandleSubmit, errors } = AuthHook();
 
-const navigate = useNavigate()
-
-  const {
-    register,
-    reset,
-    handleSubmit,
-    getValues,
-    formState: { errors },
-  } = useForm({
-    mode: "onChange",
-  });
-
-  const registerHandleSubmit = (data) => {
-    console.log(data);
-    reset();
-    toast.success("User Register Successfully");
-    navigate("/");
-  };
-
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const {showPassword, setShowPassword} = useContext(AuthContextStore);
+  
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const inputClass =
     "w-full bg-[#1B2A3D] border border-[#3A4B63] rounded-xl py-3.5 pl-11 pr-11 text-sm text-[#F1F5F9] placeholder:text-[#A8B5C8]/55 outline-none transition-all duration-200 focus:border-[#4F8CFF] focus:ring-2 focus:ring-[#4F8CFF]/20";
@@ -136,7 +121,10 @@ const navigate = useNavigate()
               </p>
             </div>
 
-            <form onSubmit={handleSubmit(registerHandleSubmit)} className="space-y-5">
+            <form
+              onSubmit={handleSubmit(registerHandleSubmit)}
+              className="space-y-5"
+            >
               {/* Full Name */}
               <div>
                 <label htmlFor="name" className={labelClass}>
@@ -153,21 +141,27 @@ const navigate = useNavigate()
                     placeholder="Enter your full name"
                     className={inputClass}
                     {...register("name", {
-                        required: "User Name is Required",
-                        setValueAs: (val)=> val.trim(),
-                        minLength :{
-                            value: 3,
-                            message: "Name must be at least 3 characters"
-                        },
-                        maxLength: {
-                            value: 50,
-                            message: "Name cannot exceed 50 characters"
-                        },
-                        validate: (val)=> val.trim().length > 0 || "Name is required",
+                      required: "User Name is Required",
+                      setValueAs: (val) => val.trim(),
+                      minLength: {
+                        value: 3,
+                        message: "Name must be at least 3 characters",
+                      },
+                      maxLength: {
+                        value: 50,
+                        message: "Name cannot exceed 50 characters",
+                      },
+                      validate: (val) =>
+                        val.trim().length > 0 || "Name is required",
                     })}
                   />
                 </div>
-                {errors.name && (<p className="text-sm text-red-600 mt-1"> {errors.name.message} </p>)}
+                {errors.name && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {" "}
+                    {errors.name.message}{" "}
+                  </p>
+                )}
               </div>
 
               {/* Email */}
@@ -186,15 +180,21 @@ const navigate = useNavigate()
                     placeholder="you@example.com"
                     className={inputClass}
                     {...register("email", {
-                        required: "Email is required",
-                        pattern: {
-                            value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                            message: "Please enter a valid email address"
-                        }
+                      required: "Email is required",
+                      pattern: {
+                        value:
+                          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                        message: "Please enter a valid email address",
+                      },
                     })}
                   />
                 </div>
-                {errors.email && (<p className="text-sm text-red-600 mt-1"> {errors.email.message} </p>)}
+                {errors.email && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {" "}
+                    {errors.email.message}{" "}
+                  </p>
+                )}
               </div>
 
               {/* Password */}
@@ -209,39 +209,51 @@ const navigate = useNavigate()
                   <input
                     id="password"
                     name="password"
-                    type= {showPassword ? "text" : "password"}
+                    type={showPassword ? "text" : "password"}
                     placeholder="Create a strong password"
                     className={inputClass}
                     {...register("password", {
-                        required: "Password is required",
-                        minLength: {
-                            value: 6,
-                            message: "Password must be at least 6 characters"
-                        },
-                        maxLength: {
-                            value: 128,
-                            message: "Password cannot exceed 128 characters"
-                        },
-                        validate: {
-                            uppercase: (val)=> /[A-Z]/.test(val) || "At least one uppercase letter is required",
-                            Number: (val)=> /[0-9]/.test(val) || "At least one number is required",
-                            special: (val)=> /[^A-Za-z0-9]/.test(val) || "At least one special character is required"
-                        }
+                      required: "Password is required",
+                      minLength: {
+                        value: 6,
+                        message: "Password must be at least 6 characters",
+                      },
+                      maxLength: {
+                        value: 128,
+                        message: "Password cannot exceed 128 characters",
+                      },
+                      validate: {
+                        uppercase: (val) =>
+                          /[A-Z]/.test(val) ||
+                          "At least one uppercase letter is required",
+                        Number: (val) =>
+                          /[0-9]/.test(val) ||
+                          "At least one number is required",
+                        special: (val) =>
+                          /[^A-Za-z0-9]/.test(val) ||
+                          "At least one special character is required",
+                      },
                     })}
                   />
 
                   <button
                     type="button"
-                    onClick={()=> setShowPassword((prev)=> !prev)}
-                    aria-label={showPassword ? "Hide Password": "Show password"}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={
+                      showPassword ? "Hide Password" : "Show password"
+                    }
                     className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#91A4BF]"
                   >
                     <Eye size={18} />
                   </button>
                 </div>
-                
-                {errors.password && (<p className="text-sm text-red-600 mt-1"> {errors.password.message} </p>)}
-                
+
+                {errors.password && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {" "}
+                    {errors.password.message}{" "}
+                  </p>
+                )}
               </div>
 
               {/* Confirm Password */}
@@ -260,21 +272,30 @@ const navigate = useNavigate()
                     placeholder="Enter your password again"
                     className={inputClass}
                     {...register("confirmPassword", {
-                        required: "Please confirm your password",
-                        validate: (val) => val === getValues("password") || "Password do not match"
+                      required: "Please confirm your password",
+                      validate: (val) =>
+                        val === getValues("password") ||
+                        "Password do not match",
                     })}
                   />
 
                   <button
                     type="button"
-                    onClick={()=> setShowConfirmPassword((prev)=> !prev)}
-                    aria-label={showConfirmPassword ? "Hide Password": "Show password"}
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    aria-label={
+                      showConfirmPassword ? "Hide Password" : "Show password"
+                    }
                     className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#91A4BF]"
                   >
                     <Eye size={18} />
                   </button>
                 </div>
-                {errors.confirmPassword && (<p className="text-sm text-red-600 mt-1"> {errors.confirmPassword.message} </p>)} 
+                {errors.confirmPassword && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {" "}
+                    {errors.confirmPassword.message}{" "}
+                  </p>
+                )}
               </div>
 
               {/* Terms */}
