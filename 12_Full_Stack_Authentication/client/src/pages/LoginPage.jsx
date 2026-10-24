@@ -14,8 +14,7 @@ import {
 } from "lucide-react";
 
 const LoginPage = () => {
-  const { register, handleSubmit, getValues, loginHandleSubmit, errors } =
-    AuthHook();
+  const { register, handleSubmit, getValues, loginHandleSubmit, errors } = AuthHook();
 
   const { showPassword, setShowPassword } = useContext(AuthContextStore);
 

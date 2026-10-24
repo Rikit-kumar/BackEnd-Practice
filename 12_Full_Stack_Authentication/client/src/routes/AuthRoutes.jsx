@@ -1,34 +1,45 @@
-import {createBrowserRouter, RouterProvider} from 'react-router'
-import LoginPage from '../pages/LoginPage'
-import RegisterPage from '../pages/RegisterPage'
-import HomePage from '../pages/HomePage'
+import { createBrowserRouter, RouterProvider } from "react-router";
+import LoginPage from "../pages/LoginPage";
+import RegisterPage from "../pages/RegisterPage";
+import HomePage from "../pages/HomePage";
+import AuthLayout from "../layouts/AuthLayout";
+import MainLayout from "../layouts/MainLayout";
 
 const AuthRoutes = () => {
-
-    const router = createBrowserRouter([
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <AuthLayout />,
+      children: [
         {
-            path: "/",
-            element: <LoginPage />
+          path: "",
+          element: <LoginPage />,
+        },
+        {
+          path: "/login",
+          element: <LoginPage />,
         },
 
         {
-            path: "/login",
-            element: <LoginPage />
+          path: "/register",
+          element: <RegisterPage />,
         },
+      ],
+    },
 
+    {
+      path: "/main",
+      element: <MainLayout />,
+      children: [
         {
-            path: "/register",
-            element: <RegisterPage />
+          path: "",
+          element: <HomePage />,
         },
+      ],
+    },
+  ]);
 
-        {
-            path: "/home",
-            element: <HomePage />
-        }
-    ])
+  return <RouterProvider router={router} />;
+};
 
-
-  return <RouterProvider router={router}/>
-}
-
-export default AuthRoutes
+export default AuthRoutes;
