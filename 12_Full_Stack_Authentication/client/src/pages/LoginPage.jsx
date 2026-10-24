@@ -14,9 +14,15 @@ import {
 } from "lucide-react";
 
 const LoginPage = () => {
-  const { register, handleSubmit, getValues, loginHandleSubmit, errors } = AuthHook();
-
-  const { showPassword, setShowPassword } = useContext(AuthContextStore);
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    loginHandleSubmit,
+    errors,
+    showPassword,
+    setShowPassword,
+  } = AuthHook();
 
   const inputClass =
     "w-full rounded-xl border border-[#3A4B63] bg-[#1B2A3D] py-3.5 pl-12 pr-12 text-sm text-[#F1F5F9] placeholder:text-[#8190A5] outline-none transition duration-200 focus:border-[#4F8CFF] focus:ring-2 focus:ring-[#4F8CFF]/20";

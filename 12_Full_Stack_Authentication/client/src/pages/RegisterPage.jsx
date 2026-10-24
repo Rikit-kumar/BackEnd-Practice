@@ -13,12 +13,17 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-
 const RegisterPage = () => {
-  const { register, handleSubmit, getValues, registerHandleSubmit, errors } = AuthHook();
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    registerHandleSubmit,
+    errors,
+    showPassword,
+    setShowPassword,
+  } = AuthHook();
 
-  const {showPassword, setShowPassword} = useContext(AuthContextStore);
-  
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const inputClass =

@@ -1,10 +1,16 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
-import { loginUser, registerUser } from "../services/auth.service";
+import { useContext, useState } from "react";
+
+import { registerUser } from "../services/auth.service";
+import { AuthContextStore } from "../context/AuthContext";
 
 const AuthHook = () => {
   const navigate = useNavigate();
+  const {login} = useContext(AuthContextStore)
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -34,15 +40,15 @@ const AuthHook = () => {
 
     try {
 
-      const result = await loginUser(data);
+      const result = await login(data);
       console.log("Login Successfully", result);
       reset();
-      toast.success("User LoggedIn Successfully");
-      navigate("/home");
+      toast.success("User Logged In Successfully");
+      navigate("/main");
       
     } catch (error) {
-      const message = error.res.message || "Login failed. Please check your credentials."
-      console.log(message)
+      const message = error.response?.data?.message || "Login failed. Please check your credentials."
+      toast.error(message);
     }
     
   };
@@ -55,6 +61,8 @@ const AuthHook = () => {
     errors,
     registerHandleSubmit,
     loginHandleSubmit,
+    showPassword, 
+    setShowPassword
   };
 };
 
