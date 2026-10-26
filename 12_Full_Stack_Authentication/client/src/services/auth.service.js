@@ -14,3 +14,8 @@ export const getCurrectUser = async (data)=>{
     const res = await api.get("/auth/me", data)
     return res.data.data.user
 }
+
+export const logoutUser = async()=>{
+    const res = await api.post("/auth/logout");
+    return Response.data
+}

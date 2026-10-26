@@ -1,17 +1,24 @@
-import React from 'react'
-import { useContext } from 'react'
-import { Outlet } from 'react-router'
-import { AuthContextStore } from '../context/AuthContext'
+import React from "react";
+import { useContext } from "react";
+import { Navigate, Outlet } from "react-router";
+import { AuthContextStore } from "../context/AuthContext";
 
 const MainLayout = () => {
+  const { user, loading } = useContext(AuthContextStore);
 
-  const {user, loading} = useContext(AuthContextStore)
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div>
-        <Outlet />
+      <Outlet />
     </div>
-  )
-}
+  );
+};
 
-export default MainLayout
+export default MainLayout;
