@@ -7,6 +7,10 @@ export const registerUser = async (data)=>{
 
 export const loginUser = async (data)=>{
     const res = await api.post('/auth/login', data)
-    return res.data
+    return res.data.data
 }
 
+export const getCurrectUser = async (data)=>{
+    const res = await api.get("/auth/me", data)
+    return res.data.data.user
+}

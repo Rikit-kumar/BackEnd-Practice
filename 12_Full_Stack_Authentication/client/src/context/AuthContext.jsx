@@ -1,31 +1,53 @@
 import { createContext, useState } from "react";
-import { setAccessToken } from "../services/api";
-import { loginUser } from "../services/auth.service";
+import { refreshAccessToken, setAccessToken } from "../services/api";
+import { getCurrectUser, loginUser } from "../services/auth.service";
+import { useEffect } from "react";
 
 export const AuthContextStore = createContext();
 
 export const AuthContextProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [accessToken, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    const [user, setUser] = useState(null);
-    const [accessToken, setToken] = useState(null)
-    const [loading, setLoading] = useState(true)
+  console.log("accessToken is -> ", accessToken);
+  console.log("user is -> ", user)
 
-    const updateAccessToken = (token)=>{
-        setToken(token);
-        setAccessToken(token)
-    }
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        const token = await refreshAccessToken();
+        updateAccessToken(token);
+        const currentUser = await getCurrectUser();
+        setUser(currentUser);
+      } catch (error) {
+        setAccessToken(null);
+        setToken(null);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    const login = async (data)=>{
-        const result = await loginUser(data);
+    restoreSession()
+  }, []);
 
-        updateAccessToken(result.accessToken);
-        setUser(result.user)
+  const updateAccessToken = (token) => {
+    setToken(token);
+    setAccessToken(token);
+  };
 
-        return  result.user
-    }
+  const login = async (data) => {
+    const result = await loginUser(data);
+
+    updateAccessToken(result.accessToken);
+    setUser(result.user);
+
+    return result.user;
+  };
 
   return (
-    <AuthContextStore.Provider value={{user, accessToken, loading, login}}>
+    <AuthContextStore.Provider value={{ user, accessToken, loading, login }}>
       {children}
     </AuthContextStore.Provider>
   );

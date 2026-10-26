@@ -102,7 +102,7 @@ export const setAccessToken = (token) => {
   accessToken = token;
 };
 
-const refreshAccessToken = async () => {
+export const refreshAccessToken = async () => {
   const response = await axios.post(
     "/api/auth/refresh",
     {},
@@ -126,32 +126,34 @@ api.interceptors.response.use(
 
   async (error) => {
     const originalRequest = error.config;
+    const isAuthEndpoint = [
+      "/auth/register",
+      "/auth/login",
+      "/auth/refresh",
+    ].some((path) => originalRequest?.url?.includes(path));
 
     if (
       error.response?.status === 401 &&
       originalRequest &&
-      !originalRequest._retry
+      !originalRequest._retry &&
+      !isAuthEndpoint
     ) {
+      originalRequest._retry = true;
 
-        originalRequest._retry = true;
+      try {
+        const newAccessToken = await refreshAccessToken();
 
-        try {
-            
-            const newAccessToken = await refreshAccessToken();
+        originalRequest.headers = originalRequest.headers || {};
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
-            originalRequest.headers = originalRequest.headers || {};
-            originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-
-            return api(originalRequest)
-
-        } catch (refreshError) {
-            setAccessToken(null);
-            return Promise.reject(refreshError)
-        }
+        return api(originalRequest);
+      } catch (refreshError) {
+        setAccessToken(null);
+        return Promise.reject(refreshError);
+      }
     }
 
-    return Promise.reject(error)
-
+    return Promise.reject(error);
   },
 );
 
