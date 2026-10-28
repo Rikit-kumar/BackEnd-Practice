@@ -30,6 +30,12 @@ export const registerUserController = async (req, res) => {
       },
     });
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: "User already exists with this email address",
+      });
+    }
+
     return res.status(500).json({
       message: "Internal Server Error",
     });
@@ -108,7 +114,7 @@ export const tokenRefreshController = async (req, res) => {
       }
 
       if (refreshToken !== user.refreshToken) {
-        await userModel.findById(id, {
+        await userModel.findByIdAndUpdate(id, {
           refreshToken: null,
         });
 
@@ -141,14 +147,68 @@ export const tokenRefreshController = async (req, res) => {
           accessToken,
         },
       });
-      
     } catch (error) {
       return res.status(401).json({
         message: "Unauthorized, Invalid or expired refresh token",
       });
     }
-
   } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const userDetailController = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const user = await userModel.findById(id);
+
+    if (!user) {
+      return res.status(401).json({
+        message: "Unauthorized, user not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "User detail fetched successfully",
+      data: {
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+        },
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const logoutUserController = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const user = await userModel.findById(id);
+
+    if (!user) {
+      return res.status(401).json({
+        message: "Unauthorized, user not found",
+      });
+    }
+
+    await userModel.findByIdAndUpdate(user._id, {
+      refreshToken: null,
+    });
+
+    res.clearCookie("refreshToken");
+
+    return res.status(200).json({
+      message: "User logged out successfully",
+    });
+  } catch (error) {
+    console.log("logout user error", error);
     return res.status(500).json({
       message: "Internal Server Error",
     });
