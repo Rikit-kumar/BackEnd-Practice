@@ -34,6 +34,8 @@ export const generateLongToShortUrlController = async (req, res) => {
       user: req.user.id,
     });
 
+    console.log("new url -> ", newUrl);
+
     return res.status(201).json({
       message: "Url Shortened Successfully",
       data: {
@@ -44,6 +46,33 @@ export const generateLongToShortUrlController = async (req, res) => {
   } catch (error) {
     console.error("long to short code controller error", error);
 
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const redirectOriginalUrlController = async (req, res) => {
+  try {
+    const { code } = req.params;
+
+    const url = await urlModel.findOne({ shortCode: code });
+
+    if (!url) {
+      return res.status(404).json({
+        message: "URL not found",
+      });
+    }
+
+    await urlModel.updateOne(
+      { shortCode: code },
+      {
+        $inc: { clicks: 1 },
+      },
+    );
+
+    res.redirect(302, url.originalUrl);
+  } catch (error) {
     return res.status(500).json({
       message: "Internal Server Error",
     });
