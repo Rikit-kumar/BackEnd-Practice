@@ -26,6 +26,16 @@ export const generateLongToShortUrlController = async (req, res) => {
       });
     }
 
+    const existingUrl = await urlModel.findOne({
+      originalUrl,
+      user: req.user.id,
+    });
+    if (existingUrl) {
+      return res.status(409).json({
+        message: "You have already shortened this URL",
+      });
+    }
+
     let code = generateShortCode();
 
     const newUrl = await urlModel.create({
@@ -72,6 +82,45 @@ export const redirectOriginalUrlController = async (req, res) => {
     );
 
     res.redirect(302, url.originalUrl);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const getAllApisController = async (req, res) => {
+  try {
+    const allUrls = await urlModel
+      .find({ user: req.user.id })
+      .sort({ _id: -1 });
+    res.status(200).json({
+      message: "URLs Fetched Successfully",
+      data: {
+        allUrls,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const deleteApiController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const url = await urlModel.findOneAndDelete({ _id: id, user: req.user.id });
+
+    if (!url) {
+      return res.status(404).json({
+        message: "URL not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "URL deleted successfully",
+    });
   } catch (error) {
     return res.status(500).json({
       message: "Internal Server Error",
