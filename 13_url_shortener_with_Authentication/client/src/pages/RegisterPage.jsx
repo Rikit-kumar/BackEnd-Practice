@@ -9,7 +9,7 @@ const RegisterPage = () => {
     handleSubmit,
     handleRegisterSubmit,
     errors,
-    deps,
+    isSubmitting,
     getValues,
     showPassword,
     setShowPassword,
@@ -262,8 +262,9 @@ const RegisterPage = () => {
             <button
               type="submit"
               className="w-full flex items-center justify-center gap-2 rounded-xl bg-violet-600 py-4 text-sm font-semibold text-white transition hover:bg-violet-500 active:scale-[0.98]"
+              disabled={isSubmitting}
             >
-              Create Account
+              {isSubmitting ? "Creating Account..." : "Create Account"}
               <ArrowRight size={18} />
             </button>
           </form>
